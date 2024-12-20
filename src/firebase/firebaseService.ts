@@ -1,13 +1,25 @@
-import { doc, setDoc } from "firebase/firestore";
+import { addDoc, collection, Timestamp } from "firebase/firestore";
 import { db } from "./firebaseConfig";
 
-export const addFinanceInfo = async (userId: string, data: {amount: number, category: string, description: string}) => {
+export const addExpanses = async (
+  userId: string,
+  amount: number,
+  category: string,
+  description: string,
+  paymentMethod: string
+) => {
   try {
-    const userDocRef = doc(db, 'finance', userId);
-    await setDoc(userDocRef, data, {merge: true});
-    console.log("Finance data added Successfully");
-    
+    const docRef = await addDoc(collection(db, "expanses"), {
+      userId,
+      amount,
+      category,
+      description,
+      paymentMethod,
+      date: Timestamp.now(),
+    });
+
+    console.log("Document written with ID: ", docRef);
   } catch (error) {
-    console.log("Error document adding", error);
+    console.log("Error adding document", error);
   }
-}
+};
