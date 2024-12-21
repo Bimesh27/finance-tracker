@@ -36,7 +36,7 @@ function DashBoardForm({
 }: DashboardProps) {
    return (
       <form
-         className="mt-10 flex flex-col items-center gap-6"
+         className="mt-10 flex flex-col items-center gap-6 max-w-[25rem] relative"
          onSubmit={handleSubmit}
       >
          <div className="flex flex-col w-[25rem] space-y-2 max-sm:w-[22rem]">
@@ -75,7 +75,7 @@ function DashBoardForm({
             />
          </div>
          <Select>
-            <SelectTrigger className="w-ful max-sm:w-[22rem]">
+            <SelectTrigger className="w-[25rem] max-sm:w-[22rem]">
                <SelectValue placeholder="Payment method" />
             </SelectTrigger>
             <SelectContent>

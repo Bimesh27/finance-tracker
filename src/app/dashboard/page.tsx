@@ -5,6 +5,7 @@ import { toast } from "@/hooks/use-toast";
 import { useUserId } from "@/hooks/useUserId";
 import React, { useEffect, useState } from "react";
 import DashBoardForm from "./_components/DashBoardForm";
+import DashBoardData from "./_components/DashBoardData";
 
 function Dashboard() {
    const [amount, setAmount] = useState("");
@@ -86,17 +87,21 @@ function Dashboard() {
 
    return (
       <div className="w-full min-h-[calc(100vh - 4rem)] flex justify-center">
-         <DashBoardForm
-            handleSubmit={handleSubmit}
-            amount={amount}
-            category={category}
-            description={description}
-            setAmount={setAmount}
-            setCategory={setCategory}
-            setDescription={setDescription}
-            setPaymentMethod={setPaymentMethod}
-            isLoading={isLoading}
-         />
+         <div className="flex flex-col gap-6 w-full items-center mb-10">
+            <DashBoardForm 
+               handleSubmit={handleSubmit}
+               amount={amount}
+               category={category}
+               description={description}
+               setAmount={setAmount}
+               setCategory={setCategory}
+               setDescription={setDescription}
+               setPaymentMethod={setPaymentMethod}
+               isLoading={isLoading}
+            />
+            <hr/>
+            <DashBoardData userId={userId}/>
+         </div>
       </div>
    );
 }
