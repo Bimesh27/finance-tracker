@@ -14,7 +14,7 @@ export default function Home() {
 
    return (
       <main className="flex flex-col m-6 max-w-4xl max-h-[calc(100vh-4rem)]">
-         <h1 className="text-left text-[4rem] font-extrabold uppercase lg:text-[5rem]">
+         <h1 className="text-left text-[4rem] font-extrabold uppercase lg:text-[5rem] tracking-tight leading-tight">
             Track Your Daily <br /> Expenses
          </h1>
          <p className="text-sm font-medium">
