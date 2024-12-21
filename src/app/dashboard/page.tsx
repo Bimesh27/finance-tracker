@@ -11,6 +11,7 @@ import {
    SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { addExpanses } from "@/firebase/firebaseService";
 import { toast } from "@/hooks/use-toast";
 import { useUserId } from "@/hooks/useUserId";
 import React, { useEffect, useState } from "react";
@@ -21,14 +22,18 @@ function Dashboard() {
    const [description, setDescription] = useState("");
    const [paymentMethod, setPaymentMethod] = useState("Cash");
    const [isMounted, setIsMounted] = useState(false);
-   const userId = useUserId();
-   console.log(userId);
+   const {userId, isLoaded} = useUserId();
+   console.log(userId, typeof userId);
 
    useEffect(() => {
       setIsMounted(true);
    }, []);
 
    if (!isMounted) {
+      return null;
+   }
+
+   if (!userId || !isLoaded) {
       return null;
    }
 
@@ -40,8 +45,43 @@ function Dashboard() {
             duration: 2000,
          });
       }
-      console.log(userId, amount, category, description);
-      
+
+      if (!amount || isNaN(Number(amount))) {
+         console.log("Invalid amount");
+         return toast({
+            description: "Amount must be a valid number",
+            duration: 2000,
+         });
+      }
+
+      try {
+         if (!userId) {
+            throw new Error("user is is required");
+         }
+
+         await addExpanses(
+            userId,
+            parseFloat(amount),
+            category,
+            description,
+            paymentMethod
+         );
+
+         setAmount("");
+         setCategory("");
+         setDescription("");
+         setPaymentMethod("Cash");
+
+         toast({
+            description: "Record added successfully",
+            duration: 2000
+         });
+      } catch (error) {
+         toast({
+            description: "Error while adding record" + error,
+            duration:2000
+         });
+      }
    };
 
    return (
@@ -53,7 +93,7 @@ function Dashboard() {
             <div className="flex flex-col w-[25rem] space-y-2 max-sm:w-[22rem]">
                <Label htmlFor="amount">Amount</Label>
                <Input
-                  type="text"
+                  type="number"
                   id="amount"
                   placeholder="Enter amount"
                   value={amount}
@@ -105,7 +145,9 @@ function Dashboard() {
                </SelectContent>
             </Select>
 
-            <Button className="w-full">Add Record</Button>
+            <Button className="w-full" type="submit">
+               Add Record
+            </Button>
          </form>
       </div>
    );

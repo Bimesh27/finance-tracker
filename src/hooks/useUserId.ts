@@ -1,8 +1,7 @@
-import { useAuth } from "@clerk/nextjs"
+import { useAuth } from "@clerk/nextjs";
 
 export const useUserId = () => {
-  const {userId} = useAuth();
-  
-  return {userId};
+   const { userId,isLoaded } = useAuth();
 
-}
+   return  {userId, isLoaded} ;
+};
