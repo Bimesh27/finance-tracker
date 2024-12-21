@@ -1,12 +1,16 @@
 import {
    addDoc,
    collection,
+   deleteDoc,
+   doc,
    getDocs,
    query,
    Timestamp,
    where,
 } from "firebase/firestore";
 import { db } from "./firebaseConfig";
+import { Records } from "@/types/type";
+
 
 export const addExpanses = async (
    userId: string,
@@ -38,10 +42,35 @@ export const getExpanses = async (userId: string) => {
          where("userId", "==", userId)
       );
       const querySnapshot = await getDocs(q);
-      console.log(querySnapshot);
-      const expenses = querySnapshot.docs.map((doc) => doc.data());
+
+      // console.log(querySnapshot);
+
+      const expenses: Records[] = querySnapshot.docs.map((doc) => ({
+         id: doc.id,
+         userId: doc.data().userId,
+         amount: doc.data().amount,
+         category: doc.data().category,
+         description: doc.data().description,
+         paymentMethod: doc.data().paymentMethod,
+         date: doc.data().date,
+      }));
+
       return expenses;
    } catch (error) {
       console.log("Error getting document", error);
+   }
+};
+
+export const deleteExpenses = async (expensesId: string) => {
+   try {
+      const expensesDecRef = doc(db, "expenses", expensesId);
+      await deleteDoc(expensesDecRef);
+      console.log(
+         `Expenses record with id: ${expensesId} delete successufully`
+      );
+
+      deleteDoc(expensesDecRef);
+   } catch (error) {
+      console.log("Error delete expenses", error);
    }
 };

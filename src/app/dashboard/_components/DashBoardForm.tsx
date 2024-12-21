@@ -17,6 +17,7 @@ interface DashboardProps {
    amount: string;
    category: string;
    description: string;
+   paymentMethod: string;
    setAmount: React.Dispatch<React.SetStateAction<string>>;
    setCategory: React.Dispatch<React.SetStateAction<string>>;
    setDescription: React.Dispatch<React.SetStateAction<string>>;
@@ -28,11 +29,12 @@ function DashBoardForm({
    amount,
    category,
    description,
+   paymentMethod,
    setAmount,
    setCategory,
    setDescription,
    setPaymentMethod,
-   isLoading
+   isLoading,
 }: DashboardProps) {
    return (
       <form
@@ -74,30 +76,27 @@ function DashBoardForm({
                }}
             />
          </div>
-         <Select>
+         <Select
+            value={paymentMethod}
+            onValueChange={(value) => setPaymentMethod(value)}
+         >
             <SelectTrigger className="w-[25rem] max-sm:w-[22rem]">
                <SelectValue placeholder="Payment method" />
             </SelectTrigger>
             <SelectContent>
-               <SelectItem
-                  value="Cash"
-                  onSelect={() => setPaymentMethod("Cash")}
-               >
-                  Cash
-               </SelectItem>
-               <SelectItem
-                  value="Online"
-                  onSelect={() => setPaymentMethod("Online")}
-               >
-                  Online
-               </SelectItem>
+               <SelectItem value="Cash">Cash</SelectItem>
+               <SelectItem value="Online">Online</SelectItem>
             </SelectContent>
          </Select>
 
          <Button className="w-full" type="submit">
-            {isLoading ? <span className="flex  items-center gap-2">
-               Adding... <Loader2Icon className="animate-spin"/>
-            </span>: "Add Record"}
+            {isLoading ? (
+               <span className="flex  items-center gap-2">
+                  Adding... <Loader2Icon className="animate-spin" />
+               </span>
+            ) : (
+               "Add Record"
+            )}
          </Button>
       </form>
    );

@@ -8,23 +8,22 @@ import {
    TableHeader,
    TableRow,
 } from "@/components/ui/table";
-import { getExpanses } from "@/firebase/firebaseService";
-import { LoaderIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { deleteExpenses, getExpanses } from "@/firebase/firebaseService";
+import { LoaderCircle, LoaderIcon, Trash } from "lucide-react";
+import { SetStateAction, useEffect, useState } from "react";
+import { toast } from "@/hooks/use-toast";
+import { Records } from "@/types/type";
 
-interface Records {
+interface DashboardProps {
    userId: string;
-   amount: number;
-   category: string;
-   description: string;
-   paymentMethod: string;
-   date: Date;
+   records: Records[];
+   setRecords: React.Dispatch<SetStateAction<Records[]>>;
 }
 
-function DashBoardData({ userId }: { userId: string }) {
-   const [records, setRecords] = useState<Records[]>([]);
+function DashBoardData({ userId, setRecords, records }: DashboardProps) {
    const [isLoading, setIsLoading] = useState(true);
-   const [isMounted, setIsMounted] = useState(false);
+   const [isDeleting, setIsDeleting] = useState(false);
+   const [deletingId, setDeletingId] = useState("");
 
    useEffect(() => {
       const fetchData = async () => {
@@ -33,6 +32,7 @@ function DashBoardData({ userId }: { userId: string }) {
 
          setRecords(
             data?.map((doc) => ({
+               id: doc.id,
                userId: doc.userId,
                amount: doc.amount,
                category: doc.category,
@@ -45,23 +45,51 @@ function DashBoardData({ userId }: { userId: string }) {
 
       fetchData();
       setIsLoading(false);
-   }, [userId]);
+   }, [userId, setRecords]);
 
-   useEffect(() => {
-      setIsMounted(true);
-   }, []);
-
-   if (!isMounted) return null;
 
    const totalAmount = records.reduce((total, record) => {
       return total + (record.amount || 0); // Add item.amount if it exists, otherwise add 0
    }, 0);
 
+   const handleDelete = async (expensesId: string) => {
+      try {
+         setIsDeleting(true);
+         await deleteExpenses(expensesId);
+         const fetchData = async () => {
+            const data = await getExpanses(userId);
+            console.log("data", data);
+
+            setRecords(
+               data?.map((doc) => ({
+                  id: doc.id,
+                  userId: doc.userId,
+                  amount: doc.amount,
+                  category: doc.category,
+                  description: doc.description,
+                  paymentMethod: doc.paymentMethod,
+                  date: doc.date,
+               })) || []
+            );
+         };
+
+         fetchData();
+         setIsDeleting(false);
+         toast({
+            description: "Record deleted successfully",
+         });
+      } catch (error) {
+         toast({
+            description: "Error deleting record" + error,
+         });
+      }
+   };
+
    return (
       <div className="flex justify-center flex-col gap-2 overflow-hidden w-full">
          <h1 className="text-center font-bold"> Records </h1>
          {!isLoading ? (
-            <Table className="w-[40rem] max-sm:w-[30rem] overflow-scroll max-h-[40rem]">
+            <Table className="w-[40rem] max-sm:w-[30rem] overflow-scroll max-h-[40rem] m-auto">
                <TableCaption>A list of your recent transactions.</TableCaption>
                <TableHeader>
                   <TableRow>
@@ -74,7 +102,7 @@ function DashBoardData({ userId }: { userId: string }) {
                <TableBody>
                   {records ? (
                      records.map((record) => (
-                        <TableRow key={record.amount}>
+                        <TableRow key={record.description}>
                            <TableCell className="font-medium">
                               &#8377;{record.amount}
                            </TableCell>
@@ -82,6 +110,19 @@ function DashBoardData({ userId }: { userId: string }) {
                            <TableCell>{record.description}</TableCell>
                            <TableCell className="text-right">
                               {record.paymentMethod}
+                           </TableCell>
+                           <TableCell>
+                              {isDeleting && record.id === deletingId ? (
+                                 <LoaderCircle className="animate-spin text-red-600 size-[1rem] mx-4 " />
+                              ) : (
+                                 <Trash
+                                    className="mx-4 size-[1rem] text-red-600 cursor-pointer"
+                                    onClick={() => {
+                                       handleDelete(record?.id);
+                                       setDeletingId(record.id);
+                                    }}
+                                 />
+                              )}
                            </TableCell>
                         </TableRow>
                      ))
@@ -92,7 +133,7 @@ function DashBoardData({ userId }: { userId: string }) {
                <TableFooter>
                   <TableRow className="text-center">
                      <TableCell colSpan={2}>Total Spend: </TableCell>
-                     <TableCell>&#8377;{totalAmount}</TableCell>
+                     <TableCell colSpan={3}>&#8377;{totalAmount}</TableCell>
                   </TableRow>
                </TableFooter>
             </Table>
