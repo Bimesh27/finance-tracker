@@ -29,6 +29,7 @@ function DashBoardData({ userId, setRecords, records }: DashboardProps) {
    const [isDeleting, setIsDeleting] = useState<boolean>(false);
    const [deletingId, setDeletingId] = useState<string | undefined>("");
    const [editingRecords, setEditingRecords] = useState<Records | null>(null);
+   const [isMounted, setIsMounted] = useState(false);
 
    useEffect(() => {
       const fetchData = async () => {
@@ -51,6 +52,10 @@ function DashBoardData({ userId, setRecords, records }: DashboardProps) {
       fetchData();
       setIsLoading(false);
    }, [userId, setRecords]);
+
+   useEffect(() => {
+      setIsMounted(true);
+   }, []);
 
    const totalAmount = records.reduce((total, record) => {
       return total + (record.amount || 0); // Add item.amount if it exists, otherwise add 0
@@ -111,26 +116,34 @@ function DashBoardData({ userId, setRecords, records }: DashboardProps) {
       }
    };
 
+   if (!isMounted) return null;
+
    return (
       <div className="flex justify-center flex-col gap-2 overflow-hidden w-full">
          <h1 className="text-center font-bold"> Records </h1>
          {!isLoading ? (
-            <Table className="w-[40rem] max-sm:w-[30rem] overflow-scroll max-h-[40rem] m-auto">
+            <Table className="overflow-hidden max-h-[40rem] m-auto sm:max-w-[20rem]">
                <TableCaption>A list of your recent transactions.</TableCaption>
-               <TableHeader>
+               <TableHeader className="w-full">
                   <TableRow>
-                     <TableHead className="w-[100px]">Amount</TableHead>
-                     <TableHead>Category</TableHead>
-                     <TableHead>Descripton</TableHead>
-                     <TableHead className="text-right">Method</TableHead>
+                     <TableHead className=" font-semibold">Amount</TableHead>
+                     <TableHead className=" font-semibold">Category</TableHead>
+                     <TableHead className=" font-semibold">
+                        Descripton
+                     </TableHead>
+                     <TableHead className="font-semibold w-full max-sm:pl-6">
+                        Method
+                     </TableHead>
+                     <TableHead/>
                   </TableRow>
                </TableHeader>
                <TableBody>
                   {records ? (
                      records.map((record) => (
                         <TableRow key={record.description}>
-                           <TableCell className="font-medium">
+                           <TableCell className="font-medium max-sm:max-w-4">
                               <input
+                                 className=" dark:bg-[#0A0A0A] "
                                  type="number"
                                  value={
                                     editingRecords?.id === record.id
@@ -147,10 +160,9 @@ function DashBoardData({ userId, setRecords, records }: DashboardProps) {
                                     }));
                                  }}
                                  onBlur={() => handleBlur(record.id)}
-                                 className="w-24"
                               />
                            </TableCell>
-                           <TableCell>
+                           <TableCell className="max-sm:max-w-4 truncate">
                               <input
                                  type="text"
                                  value={
@@ -168,10 +180,10 @@ function DashBoardData({ userId, setRecords, records }: DashboardProps) {
                                     }))
                                  }
                                  onBlur={() => handleBlur(record.id)}
-                                 className="max-w-24 truncate"
+                                 className=" truncate dark:bg-[#0A0A0A]"
                               />
                            </TableCell>
-                           <TableCell>
+                           <TableCell className="max-sm:max-w-4 truncate">
                               <input
                                  type="text"
                                  value={
@@ -189,9 +201,10 @@ function DashBoardData({ userId, setRecords, records }: DashboardProps) {
                                     }))
                                  }
                                  onBlur={() => handleBlur(record.id)}
+                                 className=" dark:bg-[#0A0A0A] truncate pl-2"
                               />
                            </TableCell>
-                           <TableCell className="text-right">
+                           <TableCell className=" max-sm:max-w-4 max-sm:pl-4">
                               <input
                                  type="text"
                                  value={
@@ -209,14 +222,15 @@ function DashBoardData({ userId, setRecords, records }: DashboardProps) {
                                     }))
                                  }
                                  onBlur={() => handleBlur(record.id)}
+                                 className=" dark:bg-[#0A0A0A] pl-3"
                               />
                            </TableCell>
-                           <TableCell>
+                           <TableCell className="pr-6">
                               {isDeleting && record.id === deletingId ? (
                                  <LoaderCircle className="animate-spin text-red-600 size-[1rem] mx-4 " />
                               ) : (
                                  <Trash
-                                    className="mx-4 size-[1rem] text-red-600 cursor-pointer"
+                                    className=" size-[1rem] text-red-600 cursor-pointer"
                                     onClick={() => {
                                        handleDelete(record?.id);
                                        setDeletingId(record.id);
