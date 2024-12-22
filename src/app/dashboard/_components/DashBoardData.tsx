@@ -8,9 +8,13 @@ import {
    TableHeader,
    TableRow,
 } from "@/components/ui/table";
-import { deleteExpenses, getExpanses } from "@/firebase/firebaseService";
+import {
+   deleteExpenses,
+   getExpanses,
+   updateExpenses,
+} from "@/firebase/firebaseService";
 import { LoaderCircle, LoaderIcon, Trash } from "lucide-react";
-import { SetStateAction, useEffect, useState } from "react";
+import React, { SetStateAction, useEffect, useState } from "react";
 import { toast } from "@/hooks/use-toast";
 import { Records } from "@/types/type";
 
@@ -21,9 +25,10 @@ interface DashboardProps {
 }
 
 function DashBoardData({ userId, setRecords, records }: DashboardProps) {
-   const [isLoading, setIsLoading] = useState(true);
-   const [isDeleting, setIsDeleting] = useState(false);
-   const [deletingId, setDeletingId] = useState("");
+   const [isLoading, setIsLoading] = useState<boolean>(true);
+   const [isDeleting, setIsDeleting] = useState<boolean>(false);
+   const [deletingId, setDeletingId] = useState<string | undefined>("");
+   const [editingRecords, setEditingRecords] = useState<Records | null>(null);
 
    useEffect(() => {
       const fetchData = async () => {
@@ -46,7 +51,6 @@ function DashBoardData({ userId, setRecords, records }: DashboardProps) {
       fetchData();
       setIsLoading(false);
    }, [userId, setRecords]);
-
 
    const totalAmount = records.reduce((total, record) => {
       return total + (record.amount || 0); // Add item.amount if it exists, otherwise add 0
@@ -85,6 +89,28 @@ function DashBoardData({ userId, setRecords, records }: DashboardProps) {
       }
    };
 
+   const handleBlur = async (recordId: string) => {
+      if (editingRecords) {
+         try {
+            await updateExpenses(recordId, editingRecords);
+
+            setRecords((prev) =>
+               prev.map((record) =>
+                  record.id === recordId
+                     ? {
+                          ...record,
+                          ...editingRecords,
+                       }
+                     : record
+               )
+            );
+            setEditingRecords(null);
+         } catch (error) {
+            console.log("Error updating records", error);
+         }
+      }
+   };
+
    return (
       <div className="flex justify-center flex-col gap-2 overflow-hidden w-full">
          <h1 className="text-center font-bold"> Records </h1>
@@ -104,12 +130,86 @@ function DashBoardData({ userId, setRecords, records }: DashboardProps) {
                      records.map((record) => (
                         <TableRow key={record.description}>
                            <TableCell className="font-medium">
-                              &#8377;{record.amount}
+                              <input
+                                 type="number"
+                                 value={
+                                    editingRecords?.id === record.id
+                                       ? editingRecords.amount || ""
+                                       : record.amount
+                                 }
+                                 onFocus={() =>
+                                    setEditingRecords({ ...record })
+                                 }
+                                 onChange={(e) => {
+                                    setEditingRecords((prev) => ({
+                                       ...prev!,
+                                       amount: parseFloat(e.target.value),
+                                    }));
+                                 }}
+                                 onBlur={() => handleBlur(record.id)}
+                                 className="w-24"
+                              />
                            </TableCell>
-                           <TableCell>{record.category}</TableCell>
-                           <TableCell>{record.description}</TableCell>
+                           <TableCell>
+                              <input
+                                 type="text"
+                                 value={
+                                    editingRecords?.id === record.id
+                                       ? editingRecords.category || ""
+                                       : record.category
+                                 }
+                                 onFocus={() =>
+                                    setEditingRecords({ ...record })
+                                 }
+                                 onChange={(e) =>
+                                    setEditingRecords((prev) => ({
+                                       ...prev!,
+                                       category: e.target.value,
+                                    }))
+                                 }
+                                 onBlur={() => handleBlur(record.id)}
+                                 className="max-w-24 truncate"
+                              />
+                           </TableCell>
+                           <TableCell>
+                              <input
+                                 type="text"
+                                 value={
+                                    editingRecords?.id === record.id
+                                       ? editingRecords.description || ""
+                                       : record.description
+                                 }
+                                 onFocus={() =>
+                                    setEditingRecords({ ...record })
+                                 }
+                                 onChange={(e) =>
+                                    setEditingRecords((prev) => ({
+                                       ...prev!,
+                                       description: e.target.value,
+                                    }))
+                                 }
+                                 onBlur={() => handleBlur(record.id)}
+                              />
+                           </TableCell>
                            <TableCell className="text-right">
-                              {record.paymentMethod}
+                              <input
+                                 type="text"
+                                 value={
+                                    editingRecords?.id === record.id
+                                       ? editingRecords.paymentMethod || ""
+                                       : record.paymentMethod
+                                 }
+                                 onFocus={() =>
+                                    setEditingRecords({ ...record })
+                                 }
+                                 onChange={(e) =>
+                                    setEditingRecords((prev) => ({
+                                       ...prev!,
+                                       paymentMethod: e.target.value,
+                                    }))
+                                 }
+                                 onBlur={() => handleBlur(record.id)}
+                              />
                            </TableCell>
                            <TableCell>
                               {isDeleting && record.id === deletingId ? (

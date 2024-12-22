@@ -6,11 +6,11 @@ import {
    getDocs,
    query,
    Timestamp,
+   updateDoc,
    where,
 } from "firebase/firestore";
 import { db } from "./firebaseConfig";
 import { Records } from "@/types/type";
-
 
 export const addExpanses = async (
    userId: string,
@@ -72,5 +72,23 @@ export const deleteExpenses = async (expensesId: string) => {
       deleteDoc(expensesDecRef);
    } catch (error) {
       console.log("Error delete expenses", error);
+   }
+};
+
+export const updateExpenses = async (
+   expenseId: string,
+   updatedData: Partial<{
+      amount: number;
+      category: string;
+      description: string;
+      paymentMethod: string;
+   }>
+) => {
+   try {
+      const expenseDoc = doc(db, "expenses", expenseId);
+      await updateDoc(expenseDoc, updatedData);
+      console.log("Document updated Successfully");
+   } catch (error) {
+      console.log("Error updating document", error);
    }
 };

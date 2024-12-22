@@ -7,3 +7,12 @@ export interface Records {
    date: Date;
    id: string;
 }
+
+export interface UpdateDataShape {
+   userId: string;
+   amount: number;
+   category: string;
+   description: string;
+   paymentMethod: string;
+   date: Date;
+}
