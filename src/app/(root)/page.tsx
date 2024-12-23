@@ -4,11 +4,17 @@ import { useAuth } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 export default function Home() {
    const { isLoaded } = useAuth();
+   const [isMounted, setIsMounted] = useState(false);
 
-   if (!isLoaded) {
+   useEffect(() => {
+      setIsMounted(true);
+   }, []);
+
+   if (!isLoaded || !isMounted) {
       return null;
    }
 

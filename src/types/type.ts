@@ -3,7 +3,6 @@ export interface Records {
    amount: number;
    category: string;
    description: string;
-   paymentMethod: string;
    date: Date;
    id: string;
 }
@@ -13,7 +12,6 @@ export interface UpdateDataShape {
    amount: number;
    category: string;
    description: string;
-   paymentMethod: string;
    date: Date;
 }
 

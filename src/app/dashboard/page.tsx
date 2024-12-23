@@ -7,12 +7,12 @@ import React, { useEffect, useState } from "react";
 import DashBoardForm from "./_components/DashBoardForm";
 import DashBoardData from "./_components/DashBoardData";
 import { Records } from "@/types/type";
+import SelectMonths from "./_components/SelectMonths";
 
 function Dashboard() {
    const [amount, setAmount] = useState("");
    const [category, setCategory] = useState("");
    const [description, setDescription] = useState("");
-   const [paymentMethod, setPaymentMethod] = useState("");
    const [isMounted, setIsMounted] = useState(false);
    const [isLoading, setIsLoading] = useState(false);
    const { userId, isLoaded } = useUserId();
@@ -33,7 +33,7 @@ function Dashboard() {
 
    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
-      if (!userId || !amount || !category || !description || !paymentMethod) {
+      if (!userId || !amount || !category || !description) {
          toast({
             description: "Please fill in all fields",
             duration: 2000,
@@ -59,13 +59,7 @@ function Dashboard() {
             return;
          }
 
-         await addExpanses(
-            userId,
-            parseFloat(amount),
-            category,
-            description,
-            paymentMethod
-         );
+         await addExpanses(userId, parseFloat(amount), category, description);
          const fetchData = async () => {
             const data = await getExpanses(userId);
             console.log("data", data);
@@ -77,7 +71,6 @@ function Dashboard() {
                   amount: doc.amount,
                   category: doc.category,
                   description: doc.description,
-                  paymentMethod: doc.paymentMethod,
                   date: doc.date,
                })) || []
             );
@@ -89,7 +82,6 @@ function Dashboard() {
          setAmount("");
          setCategory("");
          setDescription("");
-         setPaymentMethod("");
 
          toast({
             description: "Record added successfully",
@@ -113,14 +105,17 @@ function Dashboard() {
                amount={amount}
                category={category}
                description={description}
-               paymentMethod={paymentMethod}
                setAmount={setAmount}
                setCategory={setCategory}
                setDescription={setDescription}
-               setPaymentMethod={setPaymentMethod}
                isLoading={isLoading}
             />
             <hr />
+
+            <div className="flex flex-col gap-2 items-center ">
+               <p className="text-sm">See the record of the selected months</p>
+               <SelectMonths />
+            </div>
             <DashBoardData
                userId={userId}
                setRecords={setRecords}

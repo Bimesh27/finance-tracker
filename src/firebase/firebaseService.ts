@@ -17,7 +17,6 @@ export const addExpanses = async (
    amount: number,
    category: string,
    description: string,
-   paymentMethod: string
 ) => {
    try {
       const docRef = await addDoc(collection(db, "expenses"), {
@@ -25,7 +24,6 @@ export const addExpanses = async (
          amount,
          category,
          description,
-         paymentMethod,
          date: Timestamp.now(),
       });
 
@@ -51,7 +49,6 @@ export const getExpanses = async (userId: string) => {
          amount: doc.data().amount,
          category: doc.data().category,
          description: doc.data().description,
-         paymentMethod: doc.data().paymentMethod,
          date: doc.data().date,
       }));
 
@@ -81,7 +78,6 @@ export const updateExpenses = async (
       amount: number;
       category: string;
       description: string;
-      paymentMethod: string;
    }>
 ) => {
    try {

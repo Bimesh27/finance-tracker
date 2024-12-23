@@ -1,13 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-   Select,
-   SelectContent,
-   SelectItem,
-   SelectTrigger,
-   SelectValue,
-} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Loader2Icon } from "lucide-react";
 
@@ -17,11 +10,9 @@ interface DashboardProps {
    amount: string;
    category: string;
    description: string;
-   paymentMethod: string;
    setAmount: React.Dispatch<React.SetStateAction<string>>;
    setCategory: React.Dispatch<React.SetStateAction<string>>;
    setDescription: React.Dispatch<React.SetStateAction<string>>;
-   setPaymentMethod: React.Dispatch<React.SetStateAction<string>>;
 }
 
 function DashBoardForm({
@@ -29,11 +20,9 @@ function DashBoardForm({
    amount,
    category,
    description,
-   paymentMethod,
    setAmount,
    setCategory,
    setDescription,
-   setPaymentMethod,
    isLoading,
 }: DashboardProps) {
    return (
@@ -76,18 +65,6 @@ function DashBoardForm({
                }}
             />
          </div>
-         <Select
-            value={paymentMethod}
-            onValueChange={(value) => setPaymentMethod(value)}
-         >
-            <SelectTrigger className="w-[25rem] max-sm:w-[22rem]">
-               <SelectValue placeholder="Payment method" />
-            </SelectTrigger>
-            <SelectContent>
-               <SelectItem value="Cash">Cash</SelectItem>
-               <SelectItem value="Online">Online</SelectItem>
-            </SelectContent>
-         </Select>
 
          <Button className="w-full" type="submit">
             {isLoading ? (

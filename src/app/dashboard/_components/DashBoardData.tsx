@@ -43,7 +43,6 @@ function DashBoardData({ userId, setRecords, records }: DashboardProps) {
                amount: doc.amount,
                category: doc.category,
                description: doc.description,
-               paymentMethod: doc.paymentMethod,
                date: doc.date,
             })) || []
          );
@@ -76,7 +75,6 @@ function DashBoardData({ userId, setRecords, records }: DashboardProps) {
                   amount: doc.amount,
                   category: doc.category,
                   description: doc.description,
-                  paymentMethod: doc.paymentMethod,
                   date: doc.date,
                })) || []
             );
@@ -131,10 +129,6 @@ function DashBoardData({ userId, setRecords, records }: DashboardProps) {
                      <TableHead className=" font-semibold">
                         Descripton
                      </TableHead>
-                     <TableHead className="font-semibold w-full max-sm:pl-6">
-                        Method
-                     </TableHead>
-                     <TableHead/>
                   </TableRow>
                </TableHeader>
                <TableBody>
@@ -204,30 +198,9 @@ function DashBoardData({ userId, setRecords, records }: DashboardProps) {
                                  className=" dark:bg-[#0A0A0A] truncate pl-2"
                               />
                            </TableCell>
-                           <TableCell className=" max-sm:max-w-4 max-sm:pl-4">
-                              <input
-                                 type="text"
-                                 value={
-                                    editingRecords?.id === record.id
-                                       ? editingRecords.paymentMethod || ""
-                                       : record.paymentMethod
-                                 }
-                                 onFocus={() =>
-                                    setEditingRecords({ ...record })
-                                 }
-                                 onChange={(e) =>
-                                    setEditingRecords((prev) => ({
-                                       ...prev!,
-                                       paymentMethod: e.target.value,
-                                    }))
-                                 }
-                                 onBlur={() => handleBlur(record.id)}
-                                 className=" dark:bg-[#0A0A0A] pl-3"
-                              />
-                           </TableCell>
-                           <TableCell className="pr-6">
+                           <TableCell className="pr-3">
                               {isDeleting && record.id === deletingId ? (
-                                 <LoaderCircle className="animate-spin text-red-600 size-[1rem] mx-4 " />
+                                 <LoaderCircle className="animate-spin text-red-600 size-[1rem] " />
                               ) : (
                                  <Trash
                                     className=" size-[1rem] text-red-600 cursor-pointer"
