@@ -34,7 +34,6 @@ function DashBoardData({ userId, setRecords, records }: DashboardProps) {
    useEffect(() => {
       const fetchData = async () => {
          const data = await getExpanses(userId);
-         console.log("data", data);
 
          setRecords(
             data?.map((doc) => ({
